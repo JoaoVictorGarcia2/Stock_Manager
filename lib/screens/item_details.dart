@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
-import 'item_form.dart'; // Tela para editar o item
+import 'item_form.dart'; 
 
 class ItemDetails extends StatelessWidget {
   final Item item;
@@ -11,7 +11,7 @@ class ItemDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Item Details'),
+        title: Text('Detalhes do Item'),
         centerTitle: true,
         backgroundColor: Colors.teal,
       ),
@@ -33,22 +33,27 @@ class ItemDetails extends StatelessWidget {
                 ),
                 Divider(thickness: 2, height: 30),
                 Text(
-                  "Category: ${item.category}",
+                  "Categoria: ${item.category}",
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Price: \$${item.price}",
+                  "Preço: R\$${item.price.toStringAsFixed(2)}",
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Quantity: ${item.quantity}",
+                  "Quantidade: ${item.quantity}",
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Description: ${item.description}",
+                  "Descrição: ${item.description}",
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 30),
+                                Text(
+                  "Distribuidor: ${item..supplier}",
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 30),
@@ -60,17 +65,16 @@ class ItemDetails extends StatelessWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () {
-                      // Navegar para a tela de formulário com os dados preenchidos para edição
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ItemForm(item: item), // Passe o item atual
+                          builder: (context) => ItemForm(item: item), 
                         ),
                       );
                     },
                     icon: Icon(Icons.edit, color: Colors.white),
                     label: Text(
-                      "Edit Item",
+                      "Editar Item",
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),

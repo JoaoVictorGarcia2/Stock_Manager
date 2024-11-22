@@ -3,7 +3,7 @@ import '../database/app_database.dart';
 import '../models/item.dart';
 
 class ItemForm extends StatefulWidget {
-  final Item? item; // Parâmetro opcional para edição de item
+  final Item? item; 
 
   const ItemForm({Key? key, this.item}) : super(key: key);
 
@@ -19,30 +19,30 @@ class _ItemFormState extends State<ItemForm> {
   final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
   final _supplierController = TextEditingController();
+  Item? itemToEdit;
 
   @override
   void initState() {
     super.initState();
     if (widget.item != null) {
-      // Preenche os campos com os valores do item para edição
-      _nameController.text = widget.item!.name;
-      _descriptionController.text = widget.item!.description ?? '';
-      _categoryController.text = widget.item!.category ?? '';
-      _priceController.text = widget.item!.price.toString();
-      _quantityController.text = widget.item!.quantity.toString();
-      _supplierController.text = widget.item!.supplier ?? '';
+      itemToEdit = widget.item;
+      _nameController.text = itemToEdit!.name;
+      _descriptionController.text = itemToEdit!.description;
+      _categoryController.text = itemToEdit!.category;
+      _priceController.text = itemToEdit!.price.toString();
+      _quantityController.text = itemToEdit!.quantity.toString();
+      _supplierController.text = itemToEdit!.supplier;
     }
   }
 
-  void _saveItem() async {
+  void _saveOrUpdateItem() async {
     if (_formKey.currentState!.validate()) {
       try {
         final double price = double.parse(_priceController.text);
         final int quantity = int.parse(_quantityController.text);
 
-        // Cria ou atualiza o item
-        final newItem = Item(
-          id: widget.item?.id, // Mantém o ID se for edição
+        final updatedItem = Item(
+          id: itemToEdit?.id ?? 0,  
           name: _nameController.text,
           description: _descriptionController.text,
           category: _categoryController.text,
@@ -51,15 +51,13 @@ class _ItemFormState extends State<ItemForm> {
           supplier: _supplierController.text,
         );
 
-        if (widget.item == null) {
-          // Insere um novo item
-          await AppDatabase.instance.insertItem(newItem);
+        if (itemToEdit != null) {
+          await AppDatabase.instance.updateItem(updatedItem);
         } else {
-          // Atualiza o item existente
-          await AppDatabase.instance.updateItem(newItem);
+          await AppDatabase.instance.insertItem(updatedItem);
         }
 
-        Navigator.pop(context); // Volta para a tela anterior
+        Navigator.pop(context);
       } catch (e) {
         showDialog(
           context: context,
@@ -82,7 +80,8 @@ class _ItemFormState extends State<ItemForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.item == null ? 'Novo Cadastro' : 'Editar Item'),
+        title: Text(itemToEdit == null ? 'Novo Cadastro' : 'Editar Item'),
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -90,60 +89,80 @@ class _ItemFormState extends State<ItemForm> {
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: 'Nome'),
-                validator: (value) =>
-                    value!.isEmpty ? 'O campo Nome é obrigatório' : null,
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Descrição'),
-              ),
-              TextFormField(
-                controller: _categoryController,
-                decoration: InputDecoration(labelText: 'Categoria'),
-              ),
-              TextFormField(
-                controller: _priceController,
-                decoration: InputDecoration(labelText: 'Preço'),
+              _buildTextField(_nameController, 'Nome', 'O campo Nome é obrigatório'),
+              _buildTextField(_descriptionController, 'Descrição', null),
+              _buildTextField(_categoryController, 'Categoria', null),
+              _buildTextField(
+                _priceController,
+                'Preço',
+                'O campo Preço é obrigatório',
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'O campo Preço é obrigatório';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Insira um valor numérico válido';
-                  }
+                  if (value!.isEmpty) return 'O campo Preço é obrigatório';
+                  if (double.tryParse(value) == null) return 'Insira um valor numérico válido';
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _quantityController,
-                decoration: InputDecoration(labelText: 'Quantidade'),
+              _buildTextField(
+                _quantityController,
+                'Quantidade',
+                'O campo Quantidade é obrigatório',
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'O campo Quantidade é obrigatório';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Insira um número inteiro válido';
-                  }
+                  if (value!.isEmpty) return 'O campo Quantidade é obrigatório';
+                  if (int.tryParse(value) == null) return 'Insira um número inteiro válido';
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _supplierController,
-                decoration: InputDecoration(labelText: 'Fornecedor'),
-              ),
+              _buildTextField(_supplierController, 'Fornecedor', null),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _saveItem,
-                child: Text(widget.item == null ? 'Salvar' : 'Atualizar'),
+                onPressed: _saveOrUpdateItem,
+                child: Text(itemToEdit == null ? 'Salvar' : 'Atualizar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal, 
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label,
+    String? validationMessage, {
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(fontSize: 16, color: Colors.grey[700]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.blueAccent),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.blueAccent),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        keyboardType: keyboardType,
+        validator: validator ??
+            (validationMessage != null
+                ? (value) => value!.isEmpty ? validationMessage : null
+                : null),
       ),
     );
   }

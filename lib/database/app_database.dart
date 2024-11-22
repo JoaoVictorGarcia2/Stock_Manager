@@ -30,17 +30,15 @@ class AppDatabase {
   );
 }
 
-Future<int> updateItem(Item item) async {
-  final db = await instance.database;
-
-  // Atualiza o item com base no ID
-  return await db.update(
-    'items', // Nome da tabela
-    item.toMap(), // Dados do item em formato de mapa
-    where: 'id = ?', // Condição de atualização
-    whereArgs: [item.id], // Argumento para a condição
-  );
-}
+  Future<int> updateItem(Item item) async {
+    final db = await instance.database;
+    return await db.update(
+      'items',
+      item.toMap(),  
+      where: 'id = ?',
+      whereArgs: [item.id],
+    );
+  }
 
 
 

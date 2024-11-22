@@ -70,9 +70,9 @@ class _ItemListState extends State<ItemList> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Category: ${item.category}", style: TextStyle(fontSize: 14)),
-                        Text("Price: \$${item.price}", style: TextStyle(fontSize: 14)),
-                        Text("Quantity: ${item.quantity}", style: TextStyle(fontSize: 14)),
+                        Text("Categoria: ${item.category}", style: TextStyle(fontSize: 14)),
+                        Text("Preço: \$${item.price}", style: TextStyle(fontSize: 14)),
+                        Text("Quantidade: ${item.quantity}", style: TextStyle(fontSize: 14)),
                       ],
                     ),
                     trailing: Row(
@@ -105,7 +105,7 @@ class _ItemListState extends State<ItemList> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ItemForm()),
-          ).then((_) => refreshItems()); // Atualiza a lista após adicionar
+          ).then((_) => refreshItems()); 
         },
         backgroundColor: Colors.teal,
         child: Icon(Icons.add, color: Colors.white),

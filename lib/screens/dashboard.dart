@@ -56,7 +56,6 @@ class Dashboard extends StatelessWidget {
             ),
             SizedBox(height: 20),
             
-            // Botão "Add Item"
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -65,8 +64,8 @@ class Dashboard extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal, // Substituído 'primary'
-                foregroundColor: Colors.white, // Substituído 'onPrimary'
+                backgroundColor: Colors.teal, 
+                foregroundColor: Colors.white, 
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -81,7 +80,7 @@ class Dashboard extends StatelessWidget {
           ],
         ),
       ),
-      backgroundColor: Colors.grey[100], // Cor de fundo sutil
+      backgroundColor: Colors.grey[100],
     );
   }
 }
